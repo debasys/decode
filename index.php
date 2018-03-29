@@ -10,6 +10,8 @@ ini_set('memory_limit', '-1');
 //echo ini_get('memory_limit');
 while (@ob_end_flush());
 
+$log = fopen("log.txt", "w+");
+
 $words = array();
 $phrase = "wild inovation suly";
 $md5 = "87bb2bda651995d346c05b5049b4d78b";
@@ -37,20 +39,29 @@ array_push($phrase_array, "suly");
 
 ob_start();
 $combinatorics1 = new Math_Combinatorics;
+
+fwrite($log, "starting..." . PHP_EOL);
+
 foreach($combinatorics1->combinations($words, 2) as $c) {
-    
+
     $temp = array_merge($phrase_array, $c);
     
     $combinatorics = new Math_Combinatorics;
     foreach($combinatorics->permutations($temp, 5) as $p) {
       $new_phrase =  join(' ', $p);
       //echo "New phrase: " . $new_phrase . PHP_EOL;
+      fwrite($log, $new_phrase . PHP_EOL);
       
       if(md5($new_phrase) == $md5){
+          fwrite($log, PHP_EOL . "Found:" . $new_phrase . PHP_EOL);
+          fclose($log);
           die($new_phrase);
       }
     }
 }
+
+fwrite($log, "ending..." . PHP_EOL);
+fclose($log);
 
 ob_end_flush(); 
 echo "Not match..";
